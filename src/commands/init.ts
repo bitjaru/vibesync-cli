@@ -100,12 +100,9 @@ export async function initCommand(options: InitOptions) {
       ? { frontend: '프론트엔드', backend: '백엔드', mobile: '모바일', fullstack: '풀스택' }[repo.type]
       : repo.type;
 
-    console.log(`  ${chalk.cyan('●')} ${chalk.bold(repo.name)}`);
-    console.log(`    ${chalk.gray('Type:')} ${typeLabel}`);
-    console.log(`    ${chalk.gray('Stack:')} ${repo.techStack?.join(', ') || 'N/A'}`);
-    console.log(`    ${chalk.gray('Desc:')} ${repo.description || 'N/A'}`);
-    console.log();
+    console.log(`  ${chalk.cyan('●')} ${chalk.bold(repo.name)} ${chalk.gray(`(${typeLabel})`)}`);
   });
+  console.log();
 
   // STEP 3.5: Select repositories to include
   const { selectedRepos } = await inquirer.prompt([
@@ -113,15 +110,15 @@ export async function initCommand(options: InitOptions) {
       type: 'checkbox',
       name: 'selectedRepos',
       message: lang === 'ko'
-        ? '포함할 레포지토리를 선택하세요 (스페이스바로 선택, 엔터로 확인):'
-        : 'Select repositories to include (space to select, enter to confirm):',
+        ? '포함할 레포지토리를 선택하세요:'
+        : 'Select repositories to include:',
       choices: foundRepos.map(repo => {
         const typeLabel = lang === 'ko'
           ? { frontend: '프론트엔드', backend: '백엔드', mobile: '모바일', fullstack: '풀스택' }[repo.type]
           : repo.type;
 
         return {
-          name: `${repo.name} (${typeLabel} - ${repo.techStack?.join(', ') || 'N/A'})`,
+          name: `${repo.name} (${typeLabel})`,
           value: repo.name,
           checked: true, // 기본적으로 모두 선택
         };
