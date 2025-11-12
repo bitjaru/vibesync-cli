@@ -5,13 +5,20 @@ import chalk from 'chalk';
 import { initCommand } from './commands/init';
 import { updateCommand } from './commands/update';
 import { addRepoCommand } from './commands/add-repo';
+import * as path from 'path';
+import * as fs from 'fs';
+
+// Read version from package.json
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+const version = packageJson.version;
 
 const program = new Command();
 
 program
   .name('codesyncer')
   .description('AI-powered multi-repository collaboration system')
-  .version('1.0.0 (Currently supports: Claude Code only)\n\n' +
+  .version(`${version} (Currently supports: Claude Code only)\n\n` +
     chalk.gray('Want to add support for Cursor, GitHub Copilot, or other AI tools?\n') +
     chalk.gray('We welcome contributions! https://github.com/bitjaru/codesyncer'))
   .addHelpText('after', `
