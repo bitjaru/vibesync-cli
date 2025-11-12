@@ -115,42 +115,53 @@ workspace/
 codesyncer init
 ```
 
+다음을 입력합니다:
+- 언어 선택 (한글/English)
+- 프로젝트 이름
+- GitHub 사용자명
+
 **실행 과정:**
-1. CodeSyncer가 문서 프레임워크 생성
-2. AI 어시스턴트가 각 레포지토리 분석
-3. AI가 CodeSyncer 구조에 따라 문서 생성:
-   - `.codesyncer/MASTER_CODESYNCER.md` (워크스페이스 루트)
-   - `<repo>/.claude/CLAUDE.md` (코딩 가이드라인)
+1. CodeSyncer가 레포지토리 스캔
+2. 기술 스택과 프로젝트 타입 자동 감지
+3. 발견한 레포 정보와 함께 `.codesyncer/SETUP_GUIDE.md` 생성
+
+**CodeSyncer는 여기까지만 합니다!** 프레임워크와 규칙만 제공하고, 이제 AI가 직접 설정합니다.
+
+### 5단계: AI가 모든 설정 완료
+
+Claude Code (또는 선호하는 AI 어시스턴트)를 실행하고 다음과 같이 말하세요:
+
+```
+".codesyncer/SETUP_GUIDE.md 파일을 읽고 지시사항대로 설정해줘"
+```
+
+**AI가 수행하는 작업:**
+1. **분석**: 실제 코드를 읽고 각 레포지토리 분석
+2. **질문**: 중요한 사항은 절대 추론하지 않고 질문합니다:
+   - API 엔드포인트
+   - 비즈니스 로직과 가격 정책
+   - 인증 방식
+   - 데이터베이스 스키마
+   - 외부 서비스 연동
+3. **문서 생성**: 사용자 답변을 기반으로 생성:
+   - `.codesyncer/MASTER_CODESYNCER.md` (멀티 레포 네비게이션)
+   - `<repo>/.claude/CLAUDE.md` (코딩 규칙)
    - `<repo>/.claude/ARCHITECTURE.md` (프로젝트 구조)
    - `<repo>/.claude/DECISIONS.md` (의사결정 기록)
-   - `<repo>/.claude/COMMENT_GUIDE.md` (주석 태그 가이드)
+   - `<repo>/.claude/COMMENT_GUIDE.md` (태그 가이드)
 
-### 5단계: 설정 모드 선택
+### 6단계: 코딩 시작!
 
-**⚡ 퀵 설치** (권장)
-- 모든 레포 자동 감지
-- 한 번에 협업 시스템 생성
-- 모든 의논 키워드 자동 활성화
+설정이 완료되면 AI에게 다음과 같이 말하세요:
+```
+"CLAUDE.md 읽어줘"
+```
 
-**🔧 전문가 설치**
-- 모든 옵션 세부 설정
-- 특정 키워드 카테고리 선택
-- 커스텀 키워드 추가
-
-### 4. 언어 선택
-
-한글 또는 English 선택
-
-### 5. 완료!
-
-CodeSyncer가 자동으로:
-- 레포 스캔 및 감지 (Java, Python, Node.js, React 등)
-- 워크스페이스 루트에 마스터 문서 생성 (`.codesyncer/MASTER_CODESYNCER.md`)
-- 각 레포에 협업 파일 생성 (`.claude/` 폴더)
-  - `CLAUDE.md` - 코딩 가이드라인
-  - `COMMENT_GUIDE.md` - 주석 태그 사용 가이드
-  - `ARCHITECTURE.md` - 프로젝트 구조 (자동 업데이트)
-  - `DECISIONS.md` - 의사결정 기록
+AI 어시스턴트가:
+- 프로젝트의 코딩 규칙 준수
+- 올바른 기술 스택 패턴 사용
+- 중요한 결정 전 질문
+- 모든 결정을 `@codesyncer-*` 태그로 기록
 
 ---
 
