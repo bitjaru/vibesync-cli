@@ -24,9 +24,9 @@ export async function scanForRepositories(rootPath: string): Promise<RepositoryI
       const isRepo = await isValidRepository(folderPath);
 
       if (isRepo) {
-        const type = await detectProjectType(folderPath);
+        const type = await detectProjectType(folderPath, entry.name);
         const techStack = await detectTechStack(folderPath, type);
-        const description = await detectDescription(folderPath, type, techStack);
+        const description = await detectDescription(folderPath, type, techStack, entry.name);
         const hasCodeSyncer = await hasCodeSyncerSetup(folderPath);
 
         repos.push({
@@ -86,10 +86,18 @@ async function isValidRepository(folderPath: string): Promise<boolean> {
 }
 
 /**
- * Detect project type based on folder structure and files
+ * Detect project type based on folder structure, files, and repository name
  */
-async function detectProjectType(folderPath: string): Promise<'frontend' | 'backend' | 'mobile' | 'fullstack'> {
+async function detectProjectType(folderPath: string, repoName: string): Promise<'frontend' | 'backend' | 'mobile' | 'fullstack'> {
   try {
+    // Analyze repository name for hints
+    const nameLower = repoName.toLowerCase();
+    const nameHints = {
+      backend: ['server', 'api', 'backend', 'service', 'socket', 'gateway', 'middleware'],
+      frontend: ['client', 'frontend', 'web', 'app', 'ui', 'admin', 'dashboard'],
+      mobile: ['mobile', 'ios', 'android', 'app'],
+    };
+
     // Check for Java projects (Spring Boot)
     const hasPomXml = await fs.pathExists(path.join(folderPath, 'pom.xml'));
     const hasGradle = await fs.pathExists(path.join(folderPath, 'build.gradle'));
@@ -135,17 +143,41 @@ async function detectProjectType(folderPath: string): Promise<'frontend' | 'back
         return 'mobile';
       }
 
+      // Strong hint from repo name (socket server, api server, etc.)
+      if (nameHints.backend.some(keyword => nameLower.includes(keyword))) {
+        // If it has socket.io or backend keywords in name, prioritize backend
+        if (deps['socket.io'] || deps['express'] || deps['fastify'] || deps['@nestjs/core']) {
+          return 'backend';
+        }
+      }
+
       // Check for frontend (React, Vue, etc.)
       if (deps['react'] || deps['vue'] || deps['angular'] || deps['svelte']) {
+        // Check repo name hints
+        if (nameHints.frontend.some(keyword => nameLower.includes(keyword))) {
+          return 'frontend';
+        }
+
         // Check if it's Next.js (could be fullstack)
-        if (deps['next'] && (deps['prisma'] || deps['mongoose'] || deps['@prisma/client'])) {
-          return 'fullstack';
+        if (deps['next']) {
+          // If has database or backend hints in name, it's fullstack
+          if (deps['prisma'] || deps['mongoose'] || deps['@prisma/client'] ||
+              nameLower.includes('fullstack') || nameLower.includes('full-stack')) {
+            return 'fullstack';
+          }
+          // If name suggests frontend only, return frontend
+          if (nameHints.frontend.some(keyword => nameLower.includes(keyword))) {
+            return 'frontend';
+          }
+          // Next.js with no DB is usually frontend
+          return 'frontend';
         }
         return 'frontend';
       }
 
-      // Check for backend (Express, Fastify, NestJS)
-      if (deps['express'] || deps['fastify'] || deps['koa'] || deps['@nestjs/core']) {
+      // Check for backend (Express, Fastify, NestJS, Socket.IO)
+      if (deps['express'] || deps['fastify'] || deps['koa'] || deps['@nestjs/core'] ||
+          deps['socket.io'] || deps['ws']) {
         return 'backend';
       }
     }
@@ -154,6 +186,17 @@ async function detectProjectType(folderPath: string): Promise<'frontend' | 'back
     const hasPodfile = await fs.pathExists(path.join(folderPath, 'ios', 'Podfile'));
     const hasAndroidGradle = await fs.pathExists(path.join(folderPath, 'android', 'build.gradle'));
     if (hasPodfile || hasAndroidGradle) {
+      return 'mobile';
+    }
+
+    // Use repo name as fallback
+    if (nameHints.backend.some(keyword => nameLower.includes(keyword))) {
+      return 'backend';
+    }
+    if (nameHints.frontend.some(keyword => nameLower.includes(keyword))) {
+      return 'frontend';
+    }
+    if (nameHints.mobile.some(keyword => nameLower.includes(keyword))) {
       return 'mobile';
     }
 
@@ -275,12 +318,13 @@ async function detectTechStack(folderPath: string, type: 'frontend' | 'backend' 
 }
 
 /**
- * Detect project description from package.json or generate from tech stack
+ * Detect project description from package.json or generate from tech stack and repo name
  */
 async function detectDescription(
   folderPath: string,
   type: 'frontend' | 'backend' | 'mobile' | 'fullstack',
-  techStack: string[]
+  techStack: string[],
+  repoName: string
 ): Promise<string> {
   try {
     // Try to get description from package.json
@@ -292,15 +336,31 @@ async function detectDescription(
       }
     }
 
-    // Generate description based on tech stack and type
+    // Analyze repo name for specific purposes
+    const nameLower = repoName.toLowerCase();
     const mainTech = techStack[0] || 'Unknown';
     const secondaryTech = techStack.slice(1, 3).join(', ');
 
-    // Check for specific patterns in tech stack
-    if (techStack.some(t => t.toLowerCase().includes('socket'))) {
-      return `Real-time ${type} server with WebSocket`;
+    // Check for specific patterns in repo name and tech stack
+    if (nameLower.includes('socket') && techStack.some(t => t.toLowerCase().includes('socket'))) {
+      return `Real-time WebSocket server using ${mainTech}${secondaryTech ? ' with ' + secondaryTech : ''}`;
     }
 
+    if (nameLower.includes('api') || nameLower.includes('server')) {
+      if (type === 'backend') {
+        return `Backend API server using ${mainTech}${secondaryTech ? ' and ' + secondaryTech : ''}`;
+      }
+    }
+
+    if (nameLower.includes('admin') || nameLower.includes('dashboard')) {
+      return `Admin dashboard built with ${mainTech}${secondaryTech ? ' and ' + secondaryTech : ''}`;
+    }
+
+    if (nameLower.includes('middleware') || nameLower.includes('gateway')) {
+      return `${type.charAt(0).toUpperCase() + type.slice(1)} middleware/gateway using ${mainTech}`;
+    }
+
+    // General descriptions based on type
     if (type === 'fullstack') {
       return `Full-stack application using ${mainTech}${secondaryTech ? ' with ' + secondaryTech : ''}`;
     }
@@ -310,7 +370,7 @@ async function detectDescription(
     }
 
     if (type === 'backend') {
-      return `Backend API server using ${mainTech}${secondaryTech ? ' and ' + secondaryTech : ''}`;
+      return `Backend server using ${mainTech}${secondaryTech ? ' and ' + secondaryTech : ''}`;
     }
 
     if (type === 'mobile') {
