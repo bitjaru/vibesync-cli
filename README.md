@@ -11,6 +11,48 @@
 
 ---
 
+## 🤔 The Problem
+
+Working with AI on real projects? You face these issues:
+
+**1. Context is lost every session** 😫
+- New AI session = Start from scratch
+- Explain the same architecture again and again
+- "What's the API endpoint?" "How does auth work?" - Every. Single. Time.
+
+**2. Multi-repo chaos** 🤯
+```
+my-saas-project/
+├── api-server/      (backend)
+├── web-client/      (frontend)
+└── mobile-app/      (mobile)
+```
+- AI only sees one repo at a time
+- Missing context from other repos → Fragmented code
+- "Add login" needs backend API + frontend UI, but AI doesn't know both
+
+**3. AI makes dangerous assumptions** ⚠️
+- "I'll set the timeout to 30 seconds" - Wait, should be 5!
+- "Using /api/v1/..." - Wrong endpoint!
+- Guesses business logic, security settings, pricing rules
+
+**Result**: You spend more time explaining and fixing than actual coding.
+
+---
+
+## ✨ The Solution
+
+CodeSyncer gives AI the **full picture** through:
+
+1. **📝 Comments in code** - All decisions and context live where they belong
+2. **🗂️ Master document** - Cross-repo navigation and rules
+3. **📋 Per-repo docs** - Each repo's specific guidelines
+4. **🎯 Keyword system** - Auto-pause for critical decisions (payment, auth, etc.)
+
+**Result**: AI codes with **high accuracy** even in complex multi-repo projects. 🎯
+
+---
+
 ## 🎯 What is CodeSyncer?
 
 CodeSyncer provides the **framework and rules** for AI coding assistants (like Claude Code) to set up an intelligent collaboration system across your multi-repository workspace.
