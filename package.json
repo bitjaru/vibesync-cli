@@ -29,7 +29,10 @@
   "files": [
     "dist",
     "bin",
-    "src/templates"
+    "src/templates",
+    "README.md",
+    "README.ko.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
