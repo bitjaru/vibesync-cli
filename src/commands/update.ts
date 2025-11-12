@@ -75,29 +75,6 @@ export async function updateCommand(options: UpdateOptions) {
   // Scan for repositories
   const foundRepos = await scanForRepositories(currentDir);
 
-  // Read existing master doc to get current config
-  const masterPath = path.join(currentDir, '.codesyncer', 'MASTER_CODESYNCER.md');
-  let existingRepos: string[] = [];
-
-  try {
-    const masterContent = await fs.readFile(masterPath, 'utf-8');
-    // Extract repository names from the master doc (simple parsing)
-    const repoMatches = masterContent.match(/\|\s+([^|]+)\s+\|[^|]+\|[^|]+\|[^|]+\|/g);
-    if (repoMatches) {
-      existingRepos = repoMatches
-        .slice(1) // Skip header
-        .map((match) => match.split('|')[1].trim())
-        .filter(Boolean);
-    }
-  } catch (error) {
-    // Ignore if can't read
-  }
-
-  // Find new repositories
-  const currentRepoNames = foundRepos.map((r) => r.name);
-  const newRepos = foundRepos.filter((r) => !existingRepos.includes(r.name));
-  const removedRepos = existingRepos.filter((name) => !currentRepoNames.includes(name));
-
   // Check each repository for missing .claude files
   const requiredFiles = ['CLAUDE.md', 'ARCHITECTURE.md', 'COMMENT_GUIDE.md', 'DECISIONS.md'];
   const reposNeedingSetup: { repo: string; missingFiles: string[] }[] = [];
@@ -126,8 +103,12 @@ export async function updateCommand(options: UpdateOptions) {
 
   spinner.succeed(lang === 'ko' ? '스캔 완료' : 'Scan complete');
 
+  // Check if root CLAUDE.md exists
+  const rootClaudePath = path.join(currentDir, 'CLAUDE.md');
+  const hasRootClaude = await fs.pathExists(rootClaudePath);
+
   // Display changes
-  const hasChanges = newRepos.length > 0 || removedRepos.length > 0 || reposNeedingSetup.length > 0;
+  const hasChanges = reposNeedingSetup.length > 0 || !hasRootClaude;
 
   if (!hasChanges) {
     console.log(chalk.green('\n✓ Everything is up to date!\n'));
@@ -136,59 +117,39 @@ export async function updateCommand(options: UpdateOptions) {
     return;
   }
 
-  console.log(chalk.bold(lang === 'ko' ? '\n📊 변경사항 감지:\n' : '\n📊 Changes detected:\n'));
+  console.log(chalk.bold(lang === 'ko' ? '\n📊 스캔 결과:\n' : '\n📊 Scan Results:\n'));
 
-  if (newRepos.length > 0) {
-    console.log(chalk.green(`  + ${newRepos.length} ${lang === 'ko' ? '개의 새 레포지토리' : 'new repository(ies)'}:`));
-    newRepos.forEach((repo) => {
-      console.log(chalk.gray(`    - ${repo.name}`));
-    });
-    console.log();
-  }
+  // Show repository summary
+  console.log(chalk.cyan(`  ${lang === 'ko' ? '총 레포지토리' : 'Total repositories'}: ${foundRepos.length}`));
+  console.log();
 
-  if (removedRepos.length > 0) {
-    console.log(chalk.yellow(`  - ${removedRepos.length} ${lang === 'ko' ? '개의 제거된 레포지토리' : 'removed repository(ies)'}:`));
-    removedRepos.forEach((name) => {
-      console.log(chalk.gray(`    - ${name}`));
-    });
-    console.log();
-  }
-
+  // Most important: Show repos needing setup
   if (reposNeedingSetup.length > 0) {
-    console.log(chalk.yellow(`  ⚠️  ${reposNeedingSetup.length} ${lang === 'ko' ? '개의 레포지토리에 누락된 파일' : 'repository(ies) with missing files'}:`));
+    console.log(chalk.bold.yellow(`  ⚠️  ${reposNeedingSetup.length} ${lang === 'ko' ? '개의 레포지토리에 누락된 파일:' : 'repository(ies) with missing files:'}`));
     reposNeedingSetup.forEach(({ repo, missingFiles }) => {
-      console.log(chalk.gray(`    - ${repo}:`));
-      missingFiles.forEach((file) => {
-        console.log(chalk.gray(`      ✗ .claude/${file}`));
-      });
+      const allMissing = missingFiles.length === requiredFiles.length;
+      if (allMissing) {
+        console.log(chalk.gray(`    📁 ${repo}: ${chalk.red('CodeSyncer 미설정')}`));
+      } else {
+        console.log(chalk.gray(`    📁 ${repo}:`));
+        missingFiles.forEach((file) => {
+          console.log(chalk.gray(`      ✗ .claude/${file}`));
+        });
+      }
     });
     console.log();
   }
 
-  // Update workspace map
-  const updateSpinner = ora('Updating WORKSPACE_MAP.md...').start();
-
-  try {
-    const workspaceMapPath = path.join(currentDir, '.codesyncer', 'WORKSPACE_MAP.md');
-    const currentDate = new Date().toISOString().split('T')[0];
-
-    // Simple update: add a note about the scan
-    const updateNote = `\n## 🔄 Last Update: ${currentDate}\n\n`;
-    const statsNote = `**Repositories found:** ${foundRepos.length}\n`;
-    const newReposNote = newRepos.length > 0 ? `**New repositories:** ${newRepos.map((r) => r.name).join(', ')}\n` : '';
-
-    // Append update info
-    await fs.appendFile(workspaceMapPath, updateNote + statsNote + newReposNote);
-
-    updateSpinner.succeed('Updated WORKSPACE_MAP.md');
-  } catch (error) {
-    updateSpinner.fail('Failed to update WORKSPACE_MAP.md');
+  // Show fully configured repos
+  const fullyConfiguredRepos = foundRepos.filter(
+    repo => !reposNeedingSetup.find(r => r.repo === repo.name)
+  );
+  if (fullyConfiguredRepos.length > 0) {
+    console.log(chalk.green(`  ✓ ${fullyConfiguredRepos.length} ${lang === 'ko' ? '개의 레포지토리 설정 완료' : 'repository(ies) fully configured'}`));
+    console.log();
   }
 
-  // Check if root CLAUDE.md exists
-  const rootClaudePath = path.join(currentDir, 'CLAUDE.md');
-  const hasRootClaude = await fs.pathExists(rootClaudePath);
-
+  // Check and create root CLAUDE.md if missing
   if (!hasRootClaude) {
     console.log(chalk.bold.yellow('\n⚠️  Missing root CLAUDE.md (new in v2.1.2)\n'));
     console.log(chalk.gray('This file allows Claude to automatically load context at session start.\n'));
@@ -312,6 +273,7 @@ export async function updateCommand(options: UpdateOptions) {
         // Extract project info
         let projectName = path.basename(currentDir);
         try {
+          const masterPath = path.join(currentDir, '.codesyncer', 'MASTER_CODESYNCER.md');
           const masterContent = await fs.readFile(masterPath, 'utf-8');
           const nameMatch = masterContent.match(/프로젝트[:\s]*([^\n]+)|Project[:\s]*([^\n]+)/i);
           if (nameMatch) projectName = (nameMatch[1] || nameMatch[2]).trim();
@@ -757,9 +719,4 @@ rm .codesyncer/UPDATE_GUIDE.md
   }
 
   console.log(chalk.bold.green('\n✅ Update complete!\n'));
-
-  if (newRepos.length > 0) {
-    console.log(chalk.bold(lang === 'ko' ? '📝 다음 단계:\n' : '📝 Next steps:\n'));
-    console.log(`  ${chalk.cyan(lang === 'ko' ? '실행:' : 'Run:')} codesyncer add-repo ${chalk.gray(lang === 'ko' ? '(새 레포지토리 설정)' : '(to set up new repositories)')}\n`);
-  }
 }
