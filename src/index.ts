@@ -13,7 +13,7 @@ program
   .description('AI-powered multi-repository collaboration system')
   .version('1.0.0 (Currently supports: Claude Code only)\n\n' +
     chalk.gray('Want to add support for Cursor, GitHub Copilot, or other AI tools?\n') +
-    chalk.gray('We welcome contributions! https://github.com/bitjaru/codesyncer-cli'))
+    chalk.gray('We welcome contributions! https://github.com/bitjaru/codesyncer'))
   .addHelpText('after', `
 ${chalk.bold('Currently Supported AI Tools:')}
   ${chalk.green('✓')} Claude Code

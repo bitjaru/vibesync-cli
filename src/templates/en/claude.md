@@ -264,4 +264,4 @@ grep -r "@codesyncer-rule" ./
 
 ---
 
-*This collaboration system is open source. Suggest improvements at [CodeSyncer GitHub](https://github.com/bitjaru/codesyncer-cli)!*
+*This collaboration system is open source. Suggest improvements at [CodeSyncer GitHub](https://github.com/bitjaru/codesyncer)!*

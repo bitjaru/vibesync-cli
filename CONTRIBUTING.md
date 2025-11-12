@@ -12,7 +12,7 @@ CodeSyncer는 커뮤니티 기여로 성장하는 오픈소스 프로젝트입�
 
 ### 버그 리포트 🐛
 
-버그를 발견하셨나요? [Issue](https://github.com/bitjaru/codesyncer-cli/issues)를 열어주세요!
+버그를 발견하셨나요? [Issue](https://github.com/bitjaru/codesyncer/issues)를 열어주세요!
 
 **좋은 버그 리포트에 포함될 내용:**
 - 명확하고 구체적인 제목
@@ -23,7 +23,7 @@ CodeSyncer는 커뮤니티 기여로 성장하는 오픈소스 프로젝트입�
 
 ### 기능 제안 💡
 
-새로운 기능 아이디어가 있으신가요? [Issue](https://github.com/bitjaru/codesyncer-cli/issues)를 열어주세요!
+새로운 기능 아이디어가 있으신가요? [Issue](https://github.com/bitjaru/codesyncer/issues)를 열어주세요!
 
 **좋은 기능 제안에 포함될 내용:**
 - 기능이 해결하는 문제
@@ -36,8 +36,8 @@ CodeSyncer는 커뮤니티 기여로 성장하는 오픈소스 프로젝트입�
 1. **Fork** 레포지토리
 2. **Clone** 본인의 fork
    ```bash
-   git clone https://github.com/bitjaru/codesyncer-cli.git
-   cd codesyncer-cli
+   git clone https://github.com/bitjaru/codesyncer.git
+   cd codesyncer
    ```
 3. **Branch** 생성
    ```bash
@@ -195,8 +195,8 @@ npm run build
 
 ## 💬 질문이 있으신가요?
 
-- [GitHub Discussions](https://github.com/bitjaru/codesyncer-cli/discussions)
-- [Issue 생성](https://github.com/bitjaru/codesyncer-cli/issues)
+- [GitHub Discussions](https://github.com/bitjaru/codesyncer/discussions)
+- [Issue 생성](https://github.com/bitjaru/codesyncer/issues)
 
 ## 🙏 감사합니다!
 
