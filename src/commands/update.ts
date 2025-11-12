@@ -107,8 +107,8 @@ export async function updateCommand(options: UpdateOptions) {
   const rootClaudePath = path.join(currentDir, 'CLAUDE.md');
   const hasRootClaude = await fs.pathExists(rootClaudePath);
 
-  // Display changes
-  const hasChanges = reposNeedingSetup.length > 0 || !hasRootClaude;
+  // Display changes (Hard update always requires work)
+  const hasChanges = reposNeedingSetup.length > 0 || !hasRootClaude || isHardUpdate;
 
   if (!hasChanges) {
     console.log(chalk.green('\n✓ Everything is up to date!\n'));
@@ -123,30 +123,48 @@ export async function updateCommand(options: UpdateOptions) {
   console.log(chalk.cyan(`  ${lang === 'ko' ? '총 레포지토리' : 'Total repositories'}: ${foundRepos.length}`));
   console.log();
 
-  // Most important: Show repos needing setup
-  if (reposNeedingSetup.length > 0) {
-    console.log(chalk.bold.yellow(`  ⚠️  ${reposNeedingSetup.length} ${lang === 'ko' ? '개의 레포지토리에 누락된 파일:' : 'repository(ies) with missing files:'}`));
-    reposNeedingSetup.forEach(({ repo, missingFiles }) => {
-      const allMissing = missingFiles.length === requiredFiles.length;
-      if (allMissing) {
-        console.log(chalk.gray(`    📁 ${repo}: ${chalk.red('CodeSyncer 미설정')}`));
-      } else {
-        console.log(chalk.gray(`    📁 ${repo}:`));
-        missingFiles.forEach((file) => {
+  if (isHardUpdate) {
+    // Hard update mode: Show all repositories
+    console.log(chalk.bold.blue(`  🔍 ${lang === 'ko' ? '하드 업데이트 모드 - 모든 레포지토리 재검토 필요:' : 'Hard update mode - All repositories will be reviewed:'}`));
+    console.log();
+    foundRepos.forEach((repo) => {
+      const needsSetup = reposNeedingSetup.find(r => r.repo === repo.name);
+      if (needsSetup) {
+        console.log(chalk.yellow(`    📁 ${repo.name}: ${chalk.red(`누락된 파일 ${needsSetup.missingFiles.length}개`)}`));
+        needsSetup.missingFiles.forEach((file) => {
           console.log(chalk.gray(`      ✗ .claude/${file}`));
         });
+      } else {
+        console.log(chalk.cyan(`    📁 ${repo.name}: ${chalk.green('✓ 설정 완료')} ${chalk.gray('(내용 재검토 필요)')}`));
       }
     });
     console.log();
-  }
+  } else {
+    // Normal update mode: Show only repos needing setup
+    if (reposNeedingSetup.length > 0) {
+      console.log(chalk.bold.yellow(`  ⚠️  ${reposNeedingSetup.length} ${lang === 'ko' ? '개의 레포지토리에 누락된 파일:' : 'repository(ies) with missing files:'}`));
+      reposNeedingSetup.forEach(({ repo, missingFiles }) => {
+        const allMissing = missingFiles.length === requiredFiles.length;
+        if (allMissing) {
+          console.log(chalk.gray(`    📁 ${repo}: ${chalk.red('CodeSyncer 미설정')}`));
+        } else {
+          console.log(chalk.gray(`    📁 ${repo}:`));
+          missingFiles.forEach((file) => {
+            console.log(chalk.gray(`      ✗ .claude/${file}`));
+          });
+        }
+      });
+      console.log();
+    }
 
-  // Show fully configured repos
-  const fullyConfiguredRepos = foundRepos.filter(
-    repo => !reposNeedingSetup.find(r => r.repo === repo.name)
-  );
-  if (fullyConfiguredRepos.length > 0) {
-    console.log(chalk.green(`  ✓ ${fullyConfiguredRepos.length} ${lang === 'ko' ? '개의 레포지토리 설정 완료' : 'repository(ies) fully configured'}`));
-    console.log();
+    // Show fully configured repos
+    const fullyConfiguredRepos = foundRepos.filter(
+      repo => !reposNeedingSetup.find(r => r.repo === repo.name)
+    );
+    if (fullyConfiguredRepos.length > 0) {
+      console.log(chalk.green(`  ✓ ${fullyConfiguredRepos.length} ${lang === 'ko' ? '개의 레포지토리 설정 완료' : 'repository(ies) fully configured'}`));
+      console.log();
+    }
   }
 
   // Check and create root CLAUDE.md if missing
