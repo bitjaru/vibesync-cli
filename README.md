@@ -13,7 +13,15 @@
 
 ## 🎯 What is CodeSyncer?
 
-CodeSyncer is a CLI tool that sets up an intelligent collaboration system between you and AI coding assistants across multiple repositories. It helps AI understand your project structure, coding standards, and business decisions through a structured documentation system.
+CodeSyncer provides the **framework and rules** for AI coding assistants (like Claude Code) to set up an intelligent collaboration system across your multi-repository workspace.
+
+**How it works:**
+1. **You install** CodeSyncer CLI
+2. **You launch** your AI assistant (Claude Code, Cursor, etc.)
+3. **You run** `codesyncer init`
+4. **AI analyzes** your projects and generates documentation following CodeSyncer's structure
+
+CodeSyncer defines **WHERE** and **HOW** documentation should be created. Your AI assistant fills in the **WHAT** by analyzing your actual code.
 
 ### Key Features
 
@@ -23,6 +31,20 @@ CodeSyncer is a CLI tool that sets up an intelligent collaboration system betwee
 - 🤝 **Discussion Auto-Pause**: Automatically stops for critical decisions (payment, security, etc.)
 - 🌐 **Multi-Language**: Full Korean and English support
 - ⚡ **Quick Setup**: One-command installation for your entire workspace
+
+---
+
+## ⚠️ Prerequisites
+
+**CodeSyncer requires an AI coding assistant to be active.**
+
+Currently supported:
+- ✅ **Claude Code** (Recommended)
+- 🚧 Cursor (Coming soon)
+- 🚧 GitHub Copilot (Coming soon)
+- 🚧 Continue.dev (Coming soon)
+
+**Important**: Make sure your AI coding assistant is **running and active** before using CodeSyncer. The AI will analyze your projects and help generate accurate documentation.
 
 ---
 
@@ -57,7 +79,23 @@ npm install -g codesyncer@latest
 
 ## 🚀 Quick Start
 
-### 1. Navigate to your workspace root
+### Step 1: Install CodeSyncer
+
+```bash
+npm install -g codesyncer
+```
+
+### Step 2: Launch your AI assistant
+
+Open your AI coding assistant:
+- **Claude Code** (Recommended)
+- Cursor
+- GitHub Copilot
+- Or any other AI coding tool
+
+Make sure it's **active and running**.
+
+### Step 3: Navigate to your workspace
 
 ```bash
 cd /path/to/your/workspace
@@ -71,13 +109,23 @@ workspace/
 └── mobile/
 ```
 
-### 2. Run initialization
+### Step 4: Initialize CodeSyncer
 
 ```bash
 codesyncer init
 ```
 
-### 3. Choose setup mode
+**What happens:**
+1. CodeSyncer creates the documentation framework
+2. Your AI assistant analyzes each repository
+3. AI generates documentation following CodeSyncer's structure:
+   - `.codesyncer/MASTER_CODESYNCER.md` (workspace root)
+   - `<repo>/.claude/CLAUDE.md` (coding guidelines)
+   - `<repo>/.claude/ARCHITECTURE.md` (project structure)
+   - `<repo>/.claude/DECISIONS.md` (decision log)
+   - `<repo>/.claude/COMMENT_GUIDE.md` (comment tag guide)
+
+### Step 5: Choose setup mode
 
 **⚡ Quick Setup** (Recommended)
 - Auto-detects all repositories

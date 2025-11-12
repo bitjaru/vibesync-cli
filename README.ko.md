@@ -13,7 +13,15 @@
 
 ## 🎯 CodeSyncer란?
 
-CodeSyncer는 여러 레포지토리에서 AI 코딩 어시스턴트와 효율적으로 협업할 수 있도록 도와주는 CLI 도구입니다. 프로젝트 구조, 코딩 규칙, 비즈니스 결정 사항을 체계적으로 문서화하여 AI가 이해할 수 있게 만듭니다.
+CodeSyncer는 AI 코딩 어시스턴트(Claude Code 등)가 멀티 레포지토리 워크스페이스에 지능형 협업 시스템을 구축할 수 있도록 **프레임워크와 규칙**을 제공합니다.
+
+**작동 방식:**
+1. **사용자가** CodeSyncer CLI 설치
+2. **사용자가** AI 어시스턴트 실행 (Claude Code, Cursor 등)
+3. **사용자가** `codesyncer init` 실행
+4. **AI가** 프로젝트를 분석하고 CodeSyncer 구조에 따라 문서 생성
+
+CodeSyncer는 문서가 **어디에, 어떻게** 만들어져야 하는지 정의합니다. AI 어시스턴트는 실제 코드를 분석하여 **무엇을** 작성할지 결정합니다.
 
 ### 주요 기능
 
@@ -23,6 +31,20 @@ CodeSyncer는 여러 레포지토리에서 AI 코딩 어시스턴트와 효율�
 - 🤝 **자동 의논 시스템**: 중요한 결정(결제, 보안 등)에서 자동으로 일시 정지
 - 🌐 **다국어 지원**: 한글/영문 완벽 지원
 - ⚡ **빠른 설치**: 한 번의 명령으로 전체 워크스페이스 설정
+
+---
+
+## ⚠️ 사전 요구사항
+
+**CodeSyncer는 AI 코딩 어시스턴트가 활성화되어 있어야 합니다.**
+
+현재 지원:
+- ✅ **Claude Code** (권장)
+- 🚧 Cursor (곧 지원 예정)
+- 🚧 GitHub Copilot (곧 지원 예정)
+- 🚧 Continue.dev (곧 지원 예정)
+
+**중요**: CodeSyncer를 사용하기 전에 AI 코딩 어시스턴트를 **실행하고 활성화**해주세요. AI가 프로젝트를 분석하고 정확한 문서를 생성하는 데 도움을 줍니다.
 
 ---
 
@@ -57,7 +79,23 @@ npm install -g codesyncer@latest
 
 ## 🚀 빠른 시작
 
-### 1. 워크스페이스 루트로 이동
+### 1단계: CodeSyncer 설치
+
+```bash
+npm install -g codesyncer
+```
+
+### 2단계: AI 어시스턴트 실행
+
+AI 코딩 어시스턴트를 실행하세요:
+- **Claude Code** (권장)
+- Cursor
+- GitHub Copilot
+- 또는 다른 AI 코딩 도구
+
+반드시 **활성화되어 실행 중**이어야 합니다.
+
+### 3단계: 워크스페이스로 이동
 
 ```bash
 cd /path/to/your/workspace
@@ -71,13 +109,23 @@ workspace/
 └── mobile/
 ```
 
-### 2. 초기화 실행
+### 4단계: CodeSyncer 초기화
 
 ```bash
 codesyncer init
 ```
 
-### 3. 설치 모드 선택
+**실행 과정:**
+1. CodeSyncer가 문서 프레임워크 생성
+2. AI 어시스턴트가 각 레포지토리 분석
+3. AI가 CodeSyncer 구조에 따라 문서 생성:
+   - `.codesyncer/MASTER_CODESYNCER.md` (워크스페이스 루트)
+   - `<repo>/.claude/CLAUDE.md` (코딩 가이드라인)
+   - `<repo>/.claude/ARCHITECTURE.md` (프로젝트 구조)
+   - `<repo>/.claude/DECISIONS.md` (의사결정 기록)
+   - `<repo>/.claude/COMMENT_GUIDE.md` (주석 태그 가이드)
+
+### 5단계: 설정 모드 선택
 
 **⚡ 퀵 설치** (권장)
 - 모든 레포 자동 감지
