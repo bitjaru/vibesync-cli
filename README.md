@@ -115,42 +115,53 @@ workspace/
 codesyncer init
 ```
 
+You'll be asked:
+- Language preference (Korean/English)
+- Project name
+- GitHub username
+
 **What happens:**
-1. CodeSyncer creates the documentation framework
-2. Your AI assistant analyzes each repository
-3. AI generates documentation following CodeSyncer's structure:
-   - `.codesyncer/MASTER_CODESYNCER.md` (workspace root)
-   - `<repo>/.claude/CLAUDE.md` (coding guidelines)
+1. CodeSyncer scans your repositories
+2. Detects tech stacks and project types
+3. Creates `.codesyncer/SETUP_GUIDE.md` with discovered repository information
+
+**That's all CodeSyncer does!** It provides the framework and rules. Now your AI takes over.
+
+### Step 5: Let AI Set Everything Up
+
+Launch Claude Code (or your preferred AI assistant) and say:
+
+```
+"Read .codesyncer/SETUP_GUIDE.md and follow the instructions to set up"
+```
+
+**What the AI will do:**
+1. **Analyze** each repository by reading actual code
+2. **Ask you** critical questions (never assumes):
+   - API endpoints
+   - Business logic and pricing
+   - Authentication methods
+   - Database schemas
+   - External service integrations
+3. **Generate documentation** based on your answers:
+   - `.codesyncer/MASTER_CODESYNCER.md` (multi-repo navigation)
+   - `<repo>/.claude/CLAUDE.md` (coding rules)
    - `<repo>/.claude/ARCHITECTURE.md` (project structure)
    - `<repo>/.claude/DECISIONS.md` (decision log)
-   - `<repo>/.claude/COMMENT_GUIDE.md` (comment tag guide)
+   - `<repo>/.claude/COMMENT_GUIDE.md` (tag guide)
 
-### Step 5: Choose setup mode
+### Step 6: Start Coding!
 
-**⚡ Quick Setup** (Recommended)
-- Auto-detects all repositories
-- Creates collaboration system in one step
-- Enables all discussion keywords automatically
+Once setup is complete, just tell your AI:
+```
+"Read CLAUDE.md"
+```
 
-**🔧 Expert Setup**
-- Full customization options
-- Select specific keyword categories
-- Add custom keywords
-
-### 4. Select language
-
-Choose between Korean (한글) or English
-
-### 5. That's it!
-
-CodeSyncer will:
-- Scan and detect your repositories (Java, Python, Node.js, React, etc.)
-- Create master document at workspace root (`.codesyncer/MASTER_CODESYNCER.md`)
-- Generate collaboration files in each repo (`.claude/` folder)
-  - `CLAUDE.md` - Coding guidelines
-  - `COMMENT_GUIDE.md` - Comment tag usage guide
-  - `ARCHITECTURE.md` - Project structure (auto-updated)
-  - `DECISIONS.md` - Decision log
+Your AI assistant will then:
+- Follow your project's coding rules
+- Use the correct tech stack patterns
+- Ask before making critical decisions
+- Record all decisions with `@codesyncer-*` tags
 
 ---
 
