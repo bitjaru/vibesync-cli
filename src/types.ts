@@ -16,6 +16,7 @@ export interface InitOptions {
 
 export interface UpdateOptions {
   ai: AITool;
+  hard?: boolean;  // Deep scan and update all existing files
 }
 
 export interface AddRepoOptions {

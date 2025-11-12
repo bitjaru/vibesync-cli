@@ -56,7 +56,7 @@ npm install -g codesyncer
 
 ---
 
-## 🔄 업데이트
+## 🔄 CodeSyncer 업데이트
 
 ### 현재 버전 확인
 ```bash
@@ -70,10 +70,63 @@ npm view codesyncer version
 
 ### 최신 버전으로 업데이트
 ```bash
-npm update -g codesyncer
-# 또는
 npm install -g codesyncer@latest
 ```
+
+### 업데이트 후, 프로젝트 동기화
+
+CodeSyncer를 새 버전으로 업데이트한 후, `update` 명령어를 실행하여 프로젝트를 최신 템플릿 및 기능과 동기화하세요:
+
+```bash
+cd /path/to/your/multi-repo-workspace
+codesyncer update
+```
+
+**수행 작업:**
+1. ✅ 워크스페이스에 추가된 새 레포지토리 스캔
+2. ✅ 새 버전에서 누락된 파일 감지 (예: v2.1.2+ 버전의 루트 CLAUDE.md)
+3. ✅ 언어 설정 자동 감지 (한국어/영어)
+4. ✅ 새 파일 생성 전 사용자 확인 요청
+5. ✅ 기존 커스터마이징 내용 보존
+
+**출력 예시:**
+```
+🔄 CodeSyncer - Update System
+
+✓ Scan complete
+
+⚠️  Missing root CLAUDE.md (new in v2.1.2)
+This file allows Claude to automatically load context at session start.
+
+? 루트 CLAUDE.md를 생성할까요? (Y/n) Y
+
+✓ 루트 CLAUDE.md 생성 완료!
+💡 이제 Claude가 세션 시작 시 자동으로 컨텍스트를 로드합니다!
+
+🤖 다음 단계 (AI 어시스턴트에게):
+────────────────────────────────────────────────────────────
+옵션 1) 새 세션 시작
+  Claude가 자동으로 루트 CLAUDE.md를 찾아서 읽습니다.
+
+옵션 2) 현재 세션에서 바로 적용
+  "CLAUDE.md 읽어줘"
+────────────────────────────────────────────────────────────
+
+✅ Update complete!
+```
+
+**`codesyncer update` 실행 후:**
+
+다음 중 하나를 선택하여 변경사항을 적용하세요:
+
+**옵션 1: 새 AI 세션 시작** (권장)
+- 현재 AI 어시스턴트 종료
+- 새 세션 시작
+- Claude가 자동으로 루트 CLAUDE.md를 찾아서 읽음
+
+**옵션 2: 현재 세션에서 적용**
+- AI에게 말하기: **"CLAUDE.md 읽어줘"**
+- AI가 즉시 업데이트된 컨텍스트 로드
 
 ---
 

@@ -48,6 +48,7 @@ program
   .command('update')
   .description('Update project structure and documentation')
   .option('-a, --ai <tool>', 'AI tool (currently: claude only)', 'claude')
+  .option('--hard', 'Deep scan and update all existing files (not just missing files)')
   .action(updateCommand);
 
 program

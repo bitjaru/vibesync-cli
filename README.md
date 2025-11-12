@@ -56,7 +56,7 @@ npm install -g codesyncer
 
 ---
 
-## 🔄 Updating
+## 🔄 Updating CodeSyncer
 
 ### Check your current version
 ```bash
@@ -70,10 +70,63 @@ npm view codesyncer version
 
 ### Update to latest
 ```bash
-npm update -g codesyncer
-# or
 npm install -g codesyncer@latest
 ```
+
+### After updating, sync your project
+
+When you update CodeSyncer to a new version, run the `update` command to sync your project with the latest templates and features:
+
+```bash
+cd /path/to/your/multi-repo-workspace
+codesyncer update
+```
+
+**What happens:**
+1. ✅ Scans for new repositories added to your workspace
+2. ✅ Detects missing files from new versions (e.g., root CLAUDE.md in v2.1.2+)
+3. ✅ Auto-detects your language settings (English/Korean)
+4. ✅ Prompts before creating any new files
+5. ✅ Preserves your existing customizations
+
+**Example output:**
+```
+🔄 CodeSyncer - Update System
+
+✓ Scan complete
+
+⚠️  Missing root CLAUDE.md (new in v2.1.2)
+This file allows Claude to automatically load context at session start.
+
+? Create root CLAUDE.md? (Y/n) Y
+
+✓ Root CLAUDE.md created!
+💡 Claude will now automatically load context at session start!
+
+🤖 Next Steps (Tell your AI):
+────────────────────────────────────────────────────────────
+Option 1) Start a new session
+  Claude will automatically find and read root CLAUDE.md
+
+Option 2) Apply immediately in current session
+  "Read CLAUDE.md"
+────────────────────────────────────────────────────────────
+
+✅ Update complete!
+```
+
+**After running `codesyncer update`:**
+
+Choose one of these options to apply changes:
+
+**Option 1: Start a new AI session** (Recommended)
+- Close your current AI assistant
+- Open a new session
+- Claude automatically finds and reads root CLAUDE.md
+
+**Option 2: Apply in current session**
+- Tell your AI: **"Read CLAUDE.md"**
+- AI loads the updated context immediately
 
 ---
 
