@@ -107,14 +107,51 @@ export async function initCommand(options: InitOptions) {
     console.log();
   });
 
+  // STEP 3.5: Select repositories to include
+  const { selectedRepos } = await inquirer.prompt([
+    {
+      type: 'checkbox',
+      name: 'selectedRepos',
+      message: lang === 'ko'
+        ? '포함할 레포지토리를 선택하세요 (스페이스바로 선택, 엔터로 확인):'
+        : 'Select repositories to include (space to select, enter to confirm):',
+      choices: foundRepos.map(repo => {
+        const typeLabel = lang === 'ko'
+          ? { frontend: '프론트엔드', backend: '백엔드', mobile: '모바일', fullstack: '풀스택' }[repo.type]
+          : repo.type;
+
+        return {
+          name: `${repo.name} (${typeLabel} - ${repo.techStack?.join(', ') || 'N/A'})`,
+          value: repo.name,
+          checked: true, // 기본적으로 모두 선택
+        };
+      }),
+      validate: (input) => {
+        if (input.length === 0) {
+          return lang === 'ko'
+            ? '최소 하나의 레포지토리를 선택하세요'
+            : 'Please select at least one repository';
+        }
+        return true;
+      },
+    },
+  ]);
+
+  // Filter selected repositories
+  const includedRepos = foundRepos.filter(repo => selectedRepos.includes(repo.name));
+
+  console.log();
+  console.log(chalk.green(`✓ ${includedRepos.length}${lang === 'ko' ? '개 레포지토리 선택됨' : ' repositories selected'}`));
+  console.log();
+
   // STEP 4: Generate SETUP_GUIDE.md
   console.log(chalk.bold.cyan(lang === 'ko' ? '📝 설정 가이드 생성 중...\n' : '📝 Generating setup guide...\n'));
 
   const codeSyncerDir = path.join(currentDir, '.codesyncer');
   await fs.ensureDir(codeSyncerDir);
 
-  // Generate repository list for SETUP_GUIDE
-  const repoListText = foundRepos.map(repo => {
+  // Generate repository list for SETUP_GUIDE (only selected repos)
+  const repoListText = includedRepos.map(repo => {
     const typeLabel = lang === 'ko'
       ? { frontend: '프론트엔드', backend: '백엔드', mobile: '모바일', fullstack: '풀스택' }[repo.type]
       : repo.type;
