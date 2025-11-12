@@ -246,7 +246,7 @@ async function expertSetup(currentDir: string, options: InitOptions) {
         type: 'input',
         name: 'description',
         message: msg(lang, 'description'),
-        default: `${repo.type} repository`,
+        default: repo.description || `${repo.type} repository`,
       },
       {
         type: 'list',
@@ -259,8 +259,8 @@ async function expertSetup(currentDir: string, options: InitOptions) {
         type: 'input',
         name: 'techStack',
         message: msg(lang, 'techStack'),
-        default: getDefaultTechStack(repo.type).join(', '),
-        filter: (input: string) => input.split(',').map((s) => s.trim()),
+        default: repo.techStack?.join(', ') || getDefaultTechStack(repo.type).join(', '),
+        filter: (input: string) => input.split(',').map((s) => s.trim()).filter(s => s),
       },
     ]);
 
